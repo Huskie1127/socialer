@@ -4,7 +4,9 @@ import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 import android.nfc.NdefRecord;
 
-
+/*
+    处理NFC Record编码信息
+ */
 public class TextRecord
 {
     private final String mText;

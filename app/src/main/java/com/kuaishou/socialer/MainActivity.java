@@ -11,6 +11,7 @@ import com.xuexiang.xui.widget.toast.XToast;
 
 import android.app.PendingIntent;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;
@@ -29,16 +30,30 @@ import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity implements NfcAdapter.CreateNdefMessageCallback, NfcAdapter.OnNdefPushCompleteCallback {
     boolean NFCswitcher = false;
+    //NFC是否加载的View
     MaterialProgressBar materialProgressBar;
+
+    //弹框相关View
+    MaterialEditText name;
+    MaterialEditText phoneNumber;
+    MaterialEditText qq;
+    MaterialEditText weibo;
+    MaterialEditText weixin;
+
+    //NFC相关处理
     private NfcAdapter mNfcAdapter = null;
     private PendingIntent mPendingIntent = null;
     private static final String TAG = "MainActivity";
+    private String resText;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ShadowButton shadowButtonStart = (ShadowButton)findViewById(R.id.controllerNFC);
         materialProgressBar = (MaterialProgressBar)findViewById(R.id.finding);
+
+        //收藏按钮处理逻辑
         shadowButtonStart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -54,9 +69,58 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
                     {
                         NFCswitcher = true;
                         materialProgressBar.setVisibility(View.VISIBLE);
+                        resText = loginActivity.sharedPreferences.getString("name","")+","+
+                                loginActivity.sharedPreferences.getString("phoneNumber","")+","+
+                                loginActivity.sharedPreferences.getString("qq","")+","+
+                                loginActivity.sharedPreferences.getString("weixin","")+","+
+                                loginActivity.sharedPreferences.getString("weibo","");
+                        if (",,,,".equals(resText))
+                        {
+                            XToast.error(MainActivity.this,"请先设置好个人信息 再扫描 nfc tag",XToast.LENGTH_LONG).show();
+                            MaterialDialog.Builder mdb = new MaterialDialog.Builder(MainActivity.this)
+                                    .customView(R.layout.edit_dialog_layout,true).cancelable(false);
+
+                            final MaterialDialog md=mdb.show();
+                            name = (MaterialEditText)md.findViewById(R.id.EditName);
+                            phoneNumber = (MaterialEditText)md.findViewById(R.id.EditPhoneNumber);
+                            qq = (MaterialEditText)md.findViewById(R.id.editQQ);
+                            weibo = (MaterialEditText)md.findViewById(R.id.editWeiBo);
+                            weixin = (MaterialEditText)md.findViewById(R.id.editWeChat);
+                            SharedPreferences getValue = loginActivity.sharedPreferences;
+                            name.setText(getValue.getString("name",""));
+                            phoneNumber.setText(getValue.getString("phoneNumber",""));
+                            qq.setText(getValue.getString("qq",""));
+                            weixin.setText(getValue.getString("weixin",""));
+                            weibo.setText(getValue.getString("weibo",""));
+                            md.findViewById(R.id.SubmitButton).setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    //UPDATE 数据具体操作
+                                    SharedPreferences.Editor tempEditor = loginActivity
+                                            .sharedPreferences.edit();
+                                    tempEditor.putString("name",name.getEditValue().toString());
+                                    tempEditor.putString("phoneNumber",phoneNumber.getEditValue().toString());
+                                    tempEditor.putString("qq",qq.getEditValue().toString());
+                                    tempEditor.putString("weixin",weixin.getEditValue().toString());
+                                    tempEditor.putString("weibo",weibo.getEditValue().toString());
+                                    tempEditor.apply();
+                                    md.dismiss();
+
+                                    resText = loginActivity.sharedPreferences.getString("name","")+","+
+                                            loginActivity.sharedPreferences.getString("phoneNumber","")+","+
+                                            loginActivity.sharedPreferences.getString("qq","")+","+
+                                            loginActivity.sharedPreferences.getString("weixin","")+","+
+                                            loginActivity.sharedPreferences.getString("weibo","");
+                                    NdefMessage ndefMessage = new NdefMessage(new NdefRecord[]{createTextRecord(resText)});
+                                    XToast.success(MainActivity.this,"更新个人资料成功!",XToast.LENGTH_LONG).show();
+                                }
+                            });
+                        }
                         XToast.success(MainActivity.this,"你的设备支持NFC 已开始监听TAG标签",XToast.LENGTH_LONG).show();
                         mPendingIntent = PendingIntent.getActivity(MainActivity.this, 0, new Intent(MainActivity.this,
                                 MainActivity.class), 0);
+
+                        //NFC发送及前置操作
                         mNfcAdapter.setNdefPushMessageCallback(MainActivity.this, MainActivity.this);
                         mNfcAdapter.setOnNdefPushCompleteCallback(MainActivity.this, MainActivity.this);
                         mNfcAdapter.enableForegroundDispatch(MainActivity.this, mPendingIntent, null,
@@ -85,48 +149,21 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
 
     @Override
     public NdefMessage createNdefMessage(NfcEvent event) {
-        String text = loginActivity.sharedPreferences.getString("name","")+","+
-                loginActivity.sharedPreferences.getString("phoneNumber","")+","+
-                loginActivity.sharedPreferences.getString("qq","")+","+
-                loginActivity.sharedPreferences.getString("weixin","")+","+
-                loginActivity.sharedPreferences.getString("weibo","");
-        if ("".equals(text))
-            XToast.error(MainActivity.this,"请先设置好个人信息 已先发送默认配置信息",XToast.LENGTH_LONG).show();
-            text = "error,error,error,error,error";
-		/*NdefMessage ndefMessage = new NdefMessage(
-				new NdefRecord[] { NdefRecord
-						.createApplicationRecord("com.android.calculator2") });*/
-
-        NdefMessage ndefMessage = new NdefMessage(new NdefRecord[]{createTextRecord(text)});
-
-        return ndefMessage;
+        //从NDEFRecord创建NDEFMessage 供NFC发送Tag标签使用
+            NdefMessage ndefMessage = new NdefMessage(new NdefRecord[]{createTextRecord(resText)});
+            return ndefMessage;
     }
-
-//    @Override
-//    public void onResume() {
-//        super.onResume();
-//        if (mNfcAdapter != null)
-//            mNfcAdapter.enableForegroundDispatch(this, mPendingIntent, null,
-//                    null);
-//
-//    }
-//
-//    @Override
-//    public void onPause() {
-//        super.onPause();
-//        if (mNfcAdapter != null)
-//            mNfcAdapter.disableForegroundDispatch(this);
-//    }
 
     @Override
     public void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
-        if (mNfcAdapter != null)
-            mNfcAdapter.enableForegroundDispatch(this, mPendingIntent, null,
-                    null);
-        else if (mNfcAdapter != null)
-            mNfcAdapter.disableForegroundDispatch(this);
+//        if (mNfcAdapter != null && NFCswitcher == true)
+//            mNfcAdapter.enableForegroundDispatch(this, mPendingIntent, null,
+//                    null);
+//        else if (mNfcAdapter != null && NFCswitcher == false)
+//            mNfcAdapter.disableForegroundDispatch(this);
         processIntent(intent);
+        //收到NFC TAG之后调用processIntent对标签做处理 实现业务相关操作
     }
 
     public NdefRecord createTextRecord(String text) {
@@ -157,7 +194,7 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
         Toast.makeText(this, text, Toast.LENGTH_LONG).show();
         Log.d(TAG, "-------------->received ");
         MaterialDialog.Builder mdb = new MaterialDialog.Builder(MainActivity.this)
-                .customView(R.layout.view_dialog_layout,true);
+                .customView(R.layout.view_dialog_layout,true).cancelable(false);
         final MaterialDialog md = mdb.show();
         md.findViewById(R.id.collection).setOnClickListener(new View.OnClickListener() {
 

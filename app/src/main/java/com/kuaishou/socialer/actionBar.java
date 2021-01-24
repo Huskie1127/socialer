@@ -20,6 +20,9 @@ import com.xuexiang.xui.widget.dialog.materialdialog.MaterialDialog;
 import com.xuexiang.xui.widget.edittext.materialedittext.MaterialEditText;
 import com.xuexiang.xui.widget.toast.XToast;
 
+/***
+ * 导航栏相关设置  分别是个人信息选项和好友列表选项
+ */
 public class actionBar extends LinearLayout {
     MaterialEditText name;
     MaterialEditText phoneNumber;
@@ -37,7 +40,7 @@ public class actionBar extends LinearLayout {
             @Override
             public void onClick(View v) {
                 MaterialDialog.Builder mdb = new MaterialDialog.Builder(getContext())
-                        .customView(R.layout.edit_dialog_layout,true);
+                        .customView(R.layout.edit_dialog_layout,true).cancelable(false);
                 final MaterialDialog md=mdb.show();
                 name = (MaterialEditText)md.findViewById(R.id.EditName);
                 phoneNumber = (MaterialEditText)md.findViewById(R.id.EditPhoneNumber);
