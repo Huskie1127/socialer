@@ -102,25 +102,30 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
         return ndefMessage;
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        if (mNfcAdapter != null)
-            mNfcAdapter.enableForegroundDispatch(this, mPendingIntent, null,
-                    null);
-
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        if (mNfcAdapter != null)
-            mNfcAdapter.disableForegroundDispatch(this);
-    }
+//    @Override
+//    public void onResume() {
+//        super.onResume();
+//        if (mNfcAdapter != null)
+//            mNfcAdapter.enableForegroundDispatch(this, mPendingIntent, null,
+//                    null);
+//
+//    }
+//
+//    @Override
+//    public void onPause() {
+//        super.onPause();
+//        if (mNfcAdapter != null)
+//            mNfcAdapter.disableForegroundDispatch(this);
+//    }
 
     @Override
     public void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
+        if (mNfcAdapter != null)
+            mNfcAdapter.enableForegroundDispatch(this, mPendingIntent, null,
+                    null);
+        else if (mNfcAdapter != null)
+            mNfcAdapter.disableForegroundDispatch(this);
         processIntent(intent);
     }
 
