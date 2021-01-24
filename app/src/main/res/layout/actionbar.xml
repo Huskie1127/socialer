@@ -1,0 +1,30 @@
+<LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+    xmlns:android="http://schemas.android.com/apk/res/android" android:orientation="horizontal" android:layout_marginTop="15dp">
+
+    <ImageButton
+        android:id="@+id/userPhotoImageButton"
+        android:scaleType="centerInside"
+        android:layout_width="25dip"
+        android:layout_height="25dip"
+        android:background="#0000"
+        android:src="@drawable/user_photo"
+        android:layout_marginLeft="18dp"/>
+
+    <Button
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:text="Socialer"
+        android:textColor="@color/xui_config_color_black"
+        android:textAllCaps="false"
+        android:layout_weight="1"
+        android:background="#0000"/>
+    <ImageButton
+        android:layout_width="25dip"
+        android:layout_height="25dip"
+        android:scaleType="centerInside"
+        android:id="@+id/friendPhotoImageButton"
+        android:src="@drawable/friend_photo"
+        android:background="#0000"
+        android:layout_marginRight="18dp"/>
+
+</LinearLayout>
