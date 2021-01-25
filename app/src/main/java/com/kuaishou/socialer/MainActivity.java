@@ -193,6 +193,7 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
         String text = TextRecord.parse(msg.getRecords()[0]).getText();
         Toast.makeText(this, text, Toast.LENGTH_LONG).show();
         Log.d(TAG, "-------------->received ");
+        final String[] temp = text.split(",");
         MaterialDialog.Builder mdb = new MaterialDialog.Builder(MainActivity.this)
                 .customView(R.layout.view_dialog_layout,true).cancelable(false);
         final MaterialDialog md = mdb.show();
@@ -204,11 +205,18 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
                 mNfcAdapter.enableForegroundDispatch(MainActivity.this, mPendingIntent, null,
                         null);
                 //查看优先级是否能一直为最高
+                collectedUser collecteduser = new collectedUser();
+                collecteduser.setName(temp[0]);
+                collecteduser.setPhoneNumber(temp[1]);
+                collecteduser.setQQ(temp[2]);
+                collecteduser.setWeChat(temp[3]);
+                collecteduser.setWeiBo(temp[4]);
+                informationListActivity.collectedUsers.add(collecteduser);
+                informationListActivity.informationAdapter.notifyItemInserted(informationListActivity.collectedUsers.size()-1);
                 md.dismiss();
                 //处理相关逻辑
             }
         });
-        String[] temp = text.split(",");
         MaterialEditText viewName = (MaterialEditText)md.findViewById(R.id.ViewName);
         viewName.setText(temp[0]);
         MaterialEditText viewphoneNumber = (MaterialEditText)md.findViewById(R.id.ViewPhoneNumber);
