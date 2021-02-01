@@ -52,6 +52,11 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
         setContentView(R.layout.activity_main);
         ShadowButton shadowButtonStart = (ShadowButton)findViewById(R.id.controllerNFC);
         materialProgressBar = (MaterialProgressBar)findViewById(R.id.finding);
+        if (mNfcAdapter != null && NFCswitcher == true)
+            mNfcAdapter.enableForegroundDispatch(this, mPendingIntent, null,
+                    null);
+        else if (mNfcAdapter != null && NFCswitcher == false)
+            mNfcAdapter.disableForegroundDispatch(this);
 
         //收藏按钮处理逻辑
         shadowButtonStart.setOnClickListener(new View.OnClickListener() {
