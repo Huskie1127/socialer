@@ -1,5 +1,5 @@
 个人练习客户端使用
 socialer是一款通过NFC广播传送个人联系方式的App 两台手机开启NFC之后 碰一碰就能交换到两台手机上面设置的联系方式
 目前登录功能使用的是sharedpreference 好友列表暂用list存储所以关闭app之后就会消失
-现存bug：
-有Activity跳转之后 当前NFC广播优先级就会滞后 与NFC协议相关 待解决
+  TODO LIST：
+  有Activity跳转之后 当前NFC广播优先级就会滞后 与NFC协议相关 待解决
